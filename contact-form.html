@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Form</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .error { color: red; font-size: 0.9em; }
+        label { display: block; margin-top: 10px; }
+    </style>
+    <script>
+        function validateForm() {
+            let isValid = true;
+            document.getElementById("nameError").textContent = "";
+            document.getElementById("emailError").textContent = "";
+            document.getElementById("phoneError").textContent = "";
+
+            const name = document.forms["contactForm"]["name"].value;
+            const email = document.forms["contactForm"]["email"].value;
+            const phone = document.forms["contactForm"]["phone"].value;
+
+            if (name === "") {
+                document.getElementById("nameError").textContent = "Name is required.";
+                isValid = false;
+            }
+
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailPattern.test(email)) {
+                document.getElementById("emailError").textContent = "Invalid email format.";
+                isValid = false;
+            }
+
+            const phonePattern = /^\d{10}$/;
+            if (!phonePattern.test(phone)) {
+                document.getElementById("phoneError").textContent = "Phone number must be 10 digits.";
+                isValid = false;
+            }
+
+            return isValid;
+        }
+
+        function previewData() {
+            const form = document.forms["contactForm"];
+            const params = new URLSearchParams({
+                name: form["name"].value,
+                email: form["email"].value,
+                phone: form["phone"].value,
+                message: form["message"].value,
+                contact: form["contact"].value,
+                inquiry: form["inquiry"].value
+            });
+            window.location.href = window.location.pathname + "?" + params.toString();
+        }
+
+        window.onload = function() {
+            const params = new URLSearchParams(window.location.search);
+            if (params.has("name")) {
+                document.getElementById("preview").innerHTML =
+                    `<h3>Preview:</h3>
+                     <p><strong>Name:</strong> ${params.get("name")}</p>
+                     <p><strong>Email:</strong> ${params.get("email")}</p>
+                     <p><strong>Phone:</strong> ${params.get("phone")}</p>
+                     <p><strong>Message:</strong> ${params.get("message")}</p>
+                     <p><strong>Preferred Contact:</strong> ${params.get("contact")}</p>
+                     <p><strong>Inquiry Type:</strong> ${params.get("inquiry")}</p>`;
+            }
+        }
+    </script>
+</head>
+<body>
+    <h2>Contact Us</h2>
+
+    <form name="contactForm" action="#" method="POST" onsubmit="return validateForm()">
+        <label>Name:
+            <input type="text" name="name">
+            <span class="error" id="nameError"></span>
+        </label>
+
+        <label>Email:
+            <input type="email" name="email">
+            <span class="error" id="emailError"></span>
+        </label>
+
+        <label>Phone:
+            <input type="text" name="phone">
+            <span class="error" id="phoneError"></span>
+        </label>
+
+        <label>Message:
+            <textarea name="message"></textarea>
+        </label>
+
+        <label>Preferred Contact Method:</label>
+        <label><input type="radio" name="contact" value="Email" checked> Email</label>
+        <label><input type="radio" name="contact" value="Phone"> Phone</label>
+        <label><input type="radio" name="contact" value="Both"> Both</label>
+
+        <label>Inquiry Type:
+            <select name="inquiry">
+                <option value="General Inquiry">General Inquiry</option>
+                <option value="Support Request">Support Request</option>
+                <option value="Feedback">Feedback</option>
+            </select>
+        </label>
+
+        <button type="submit">Submit</button>
+        <button type="button" onclick="previewData()">Preview</button>
+    </form>
+
+    <div id="preview"></div>
+</body>
+</html>
