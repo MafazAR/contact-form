@@ -3,113 +3,207 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact Form</title>
+    <title>Contact Us</title>
     <style>
-        body { font-family: Arial, sans-serif; padding: 20px; background-color: #f9f9f9; }
-        form { background-color: white; padding: 20px; border-radius: 8px; max-width: 500px; margin: auto; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-        .error { color: red; font-size: 0.9em; }
-        label { display: block; margin-top: 10px; }
-        button { margin-top: 15px; margin-right: 10px; padding: 8px 12px; }
+        /* هنا نحدد ستايل الصفحة عشان تكون مرتبة */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .form-container {
+            max-width: 400px;
+            margin: auto;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        .form-group .radio-group {
+            display: flex;
+            gap: 10px;
+        }
+        .error {
+            color: red;
+            font-size: 0.9em;
+        }
+        .preview {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            background-color: #f9f9f9;
+        }
     </style>
-    <script>
-        function validateForm() {
-            let isValid = true;
-            document.getElementById("nameError").textContent = "";
-            document.getElementById("emailError").textContent = "";
-            document.getElementById("phoneError").textContent = "";
-
-            const name = document.forms["contactForm"]["name"].value;
-            const email = document.forms["contactForm"]["email"].value;
-            const phone = document.forms["contactForm"]["phone"].value;
-
-            if (name === "") {
-                document.getElementById("nameError").textContent = "Name is required.";
-                isValid = false;
-            }
-
-            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailPattern.test(email)) {
-                document.getElementById("emailError").textContent = "Invalid email format.";
-                isValid = false;
-            }
-
-            const phonePattern = /^\d{10}$/;
-            if (!phonePattern.test(phone)) {
-                document.getElementById("phoneError").textContent = "Phone number must be 10 digits.";
-                isValid = false;
-            }
-
-            return isValid;
-        }
-
-        function previewData() {
-            const form = document.forms["contactForm"];
-            const params = new URLSearchParams({
-                name: form["name"].value,
-                email: form["email"].value,
-                phone: form["phone"].value,
-                message: form["message"].value,
-                contact: form["contact"].value,
-                inquiry: form["inquiry"].value
-            });
-            window.location.href = window.location.pathname + "?" + params.toString();
-        }
-
-        window.onload = function() {
-            const params = new URLSearchParams(window.location.search);
-            if (params.has("name")) {
-                document.getElementById("preview").innerHTML =
-                    `<h3>Preview:</h3>
-                     <p><strong>Name:</strong> ${params.get("name")}</p>
-                     <p><strong>Email:</strong> ${params.get("email")}</p>
-                     <p><strong>Phone:</strong> ${params.get("phone")}</p>
-                     <p><strong>Message:</strong> ${params.get("message")}</p>
-                     <p><strong>Preferred Contact:</strong> ${params.get("contact")}</p>
-                     <p><strong>Inquiry Type:</strong> ${params.get("inquiry")}</p>`;
-            }
-        }
-    </script>
 </head>
 <body>
-    <h2 style="text-align: center;">Contact Us</h2>
+    <div class="form-container">
+        <h2>Contact Us</h2>
+        <!-- الفورم حق إرسال البيانات -->
+        <form id="contactForm" method="POST" action="/submit">
+            <!-- حقل الاسم -->
+            <div class="form-group">
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name" required>
+                <span class="error" id="nameError"></span> <!-- هنا بيظهر الخطأ إذا ما دخلت الاسم -->
+            </div>
+            <!-- حقل الإيميل -->
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
+                <span class="error" id="emailError"></span> <!-- هنا بيظهر الخطأ إذا الإيميل مش صحيح -->
+            </div>
+            <!-- حقل رقم الجوال -->
+            <div class="form-group">
+                <label for="phone">Phone Number:</label>
+                <input type="text" id="phone" name="phone" required>
+                <span class="error" id="phoneError"></span> <!-- هنا بيظهر الخطأ إذا الرقم مش 10 خانات -->
+            </div>
+            <!-- حقل الرسالة -->
+            <div class="form-group">
+                <label for="message">Message:</label>
+                <textarea id="message" name="message" rows="4" required></textarea>
+                <span class="error" id="messageError"></span> <!-- هنا بيظهر الخطأ إذا ما كتبت رسالة -->
+            </div>
+            <!-- طريقة التواصل المفضلة -->
+            <div class="form-group">
+                <label>Preferred Contact Method:</label>
+                <div class="radio-group">
+                    <label><input type="radio" name="contactMethod" value="Email" required> Email</label>
+                    <label><input type="radio" name="contactMethod" value="Phone"> Phone</label>
+                    <label><input type="radio" name="contactMethod" value="Both"> Both</label>
+                </div>
+            </div>
+            <!-- نوع الاستفسار -->
+            <div class="form-group">
+                <label for="inquiryType">Inquiry Type:</label>
+                <select id="inquiryType" name="inquiryType" required>
+                    <option value="">Select an option</option>
+                    <option value="General Inquiry">General Inquiry</option>
+                    <option value="Support Request">Support Request</option>
+                    <option value="Feedback">Feedback</option>
+                </select>
+                <span class="error" id="inquiryTypeError"></span> <!-- هنا بيظهر الخطأ إذا ما اخترت نوع الاستفسار -->
+            </div>
+            <!-- زر المعاينة -->
+            <button type="button" onclick="previewData()">Preview</button>
+            <!-- زر الإرسال -->
+            <button type="submit">Submit</button>
+        </form>
+        <!-- قسم المعاينة اللي بيظهر البيانات المدخلة -->
+        <div id="preview" class="preview" style="display: none;">
+            <h3>Preview</h3>
+            <p><strong>Name:</strong> <span id="previewName"></span></p>
+            <p><strong>Email:</strong> <span id="previewEmail"></span></p>
+            <p><strong>Phone:</strong> <span id="previewPhone"></span></p>
+            <p><strong>Message:</strong> <span id="previewMessage"></span></p>
+            <p><strong>Preferred Contact Method:</strong> <span id="previewContactMethod"></span></p>
+            <p><strong>Inquiry Type:</strong> <span id="previewInquiryType"></span></p>
+        </div>
+    </div>
 
-    <form name="contactForm" method="POST" onsubmit="return validateForm()">
-        <label>Name:
-            <input type="text" name="name">
-            <span class="error" id="nameError"></span>
-        </label>
+    <script>
+        // دالة التحقق من صحة الفورم
+        function validateForm() {
+            let isValid = true; // نبدأ بافتراض أن الفورم صحيح
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const phone = document.getElementById('phone').value;
+            const message = document.getElementById('message').value;
+            const inquiryType = document.getElementById('inquiryType').value;
+            const nameError = document.getElementById('nameError');
+            const emailError = document.getElementById('emailError');
+            const phoneError = document.getElementById('phoneError');
+            const messageError = document.getElementById('messageError');
+            const inquiryTypeError = document.getElementById('inquiryTypeError');
 
-        <label>Email:
-            <input type="email" name="email">
-            <span class="error" id="emailError"></span>
-        </label>
+            // نتحقق إذا الاسم فارغ
+            if (name.trim() === "") {
+                nameError.textContent = 'Name is required.';
+                isValid = false;
+            } else {
+                nameError.textContent = '';
+            }
 
-        <label>Phone:
-            <input type="text" name="phone">
-            <span class="error" id="phoneError"></span>
-        </label>
+            // نتحقق إذا الإيميل فارغ أو مش صحيح
+            if (email.trim() === "") {
+                emailError.textContent = 'Email is required.';
+                isValid = false;
+            } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                emailError.textContent = 'Invalid email format.';
+                isValid = false;
+            } else {
+                emailError.textContent = '';
+            }
 
-        <label>Message:
-            <textarea name="message"></textarea>
-        </label>
+            // نتحقق إذا رقم الجوال فارغ أو مش 10 خانات
+            if (phone.trim() === "") {
+                phoneError.textContent = 'Phone number is required.';
+                isValid = false;
+            } else if (!/^\d{10}$/.test(phone)) {
+                phoneError.textContent = 'Phone number must be 10 digits.';
+                isValid = false;
+            } else {
+                phoneError.textContent = '';
+            }
 
-        <label>Preferred Contact Method:</label>
-        <label><input type="radio" name="contact" value="Email" checked> Email</label>
-        <label><input type="radio" name="contact" value="Phone"> Phone</label>
-        <label><input type="radio" name="contact" value="Both"> Both</label>
+            // نتحقق إذا الرسالة فارغة
+            if (message.trim() === "") {
+                messageError.textContent = 'Message is required.';
+                isValid = false;
+            } else {
+                messageError.textContent = '';
+            }
 
-        <label>Inquiry Type:
-            <select name="inquiry">
-                <option value="General Inquiry">General Inquiry</option>
-                <option value="Support Request">Support Request</option>
-                <option value="Feedback">Feedback</option>
-            </select>
-        </label>
+            // نتحقق إذا ما اختار نوع الاستفسار
+            if (inquiryType === "") {
+                inquiryTypeError.textContent = 'Please select an inquiry type.';
+                isValid = false;
+            } else {
+                inquiryTypeError.textContent = '';
+            }
 
-        <button type="submit">Submit</button>
-        <button type="button" onclick="previewData()">Preview</button>
-    </form>
+            return isValid; // نرجع إذا الفورم صحيح أو لا
+        }
 
-    <div id="preview" style="margin-top: 20px;"></div>
+        // دالة المعاينة اللي بتظهر البيانات المدخلة
+        function previewData() {
+            if (!validateForm()) { // نتحقق إذا الفورم صحيح قبل العرض
+                return;
+            }
+
+            // نجمع البيانات المدخلة
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const phone = document.getElementById('phone').value;
+            const message = document.getElementById('message').value;
+            const contactMethod = document.querySelector('input[name="contactMethod"]:checked').value;
+            const inquiryType = document.getElementById('inquiryType').value;
+
+            // نعرض البيانات في قسم المعاينة
+            document.getElementById('previewName').textContent = name;
+            document.getElementById('previewEmail').textContent = email;
+            document.getElementById('previewPhone').textContent = phone;
+            document.getElementById('previewMessage').textContent = message;
+            document.getElementById('previewContactMethod').textContent = contactMethod;
+            document.getElementById('previewInquiryType').textContent = inquiryType;
+
+            // نظهر قسم المعاينة
+            document.getElementById('preview').style.display = 'block';
+        }
+
+        // نضيف مستمع للأحداث عشان نتحقق من الفورم قبل الإرسال
+        document.getElementById('contactForm').addEventListener('submit', function(event) {
+            if (!validateForm()) { // إذا الفورم مش صحيح، نمنع الإرسال
+                event.preventDefault();
+            }
+        });
+    </script>
 </body>
 </html>
